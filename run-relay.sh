@@ -1,4 +1,4 @@
-#!/bin/zsh
+#!/bin/bash
 set -e
 RKP=relaykp.json
 if [ -f $RKP ]; then
@@ -11,7 +11,7 @@ solana -u http://localhost:8899 airdrop 1
 ulimit -s unlimited
 (cd relay;
 if [[ "$OSTYPE" == "linux-gnu"* ]]; then
-    cargo run --release -p relay -- -f ./Node.toml
+    cargo run --release -p relay --features cuda -- -f ./Node.toml
 elif [[ "$OSTYPE" == "darwin"* ]]; then
     echo "NOTE: MAC Arm cpus will not be able to run the stark to snark prover, this is a known issue"
     cargo run --release -p relay --features metal -- -f ./Node.toml

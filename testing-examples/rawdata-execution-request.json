@@ -1,0 +1,34 @@
+{
+  "imageId": "4cbd37f92e687c9f9559154d4cf0a6f4e38581a74acf950012b7a571f5051b01",
+  "executionConfig": {
+    "verifyInputHash": false,
+    "forwardOutput": true
+  },
+  "inputs": [
+    {
+      "inputType": "PublicUrl",
+      "data": "http://127.0.0.1:8080/req1"
+    },
+    {
+      "inputType": "PublicUrl",
+      "data": "http://127.0.0.1:8080/req2"
+    },
+    {
+      "inputType": "PublicUrl",
+      "data": "http://127.0.0.1:8080/req3"
+    }
+  ],
+  "tip": 12000,
+  "expiry": 100,
+  "callbackConfig": {
+    "programId": "BZW6myv6UuWbCVM4UtJMJt4SzFc7vEokEH4UGTXmCeBN",
+    "instructionPrefix": [255,255,255],
+    "extraAccounts": [
+      {
+        "pubkey": "BZW6myv6UuWbCVM4UtJMJt4SzFc7vEokEH4UGTXmCeBN",
+        "isSigner": false,
+        "isWritable": false
+      }
+    ]
+  }
+}

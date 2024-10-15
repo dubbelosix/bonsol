@@ -1,0 +1,12 @@
+{
+  "name": "readaccounts",
+  "binaryPath": "images/readaccounts/target/riscv-guest/riscv32im-risc0-zkvm-elf/docker/readaccounts/readaccounts",
+  "imageId": "4cbd37f92e687c9f9559154d4cf0a6f4e38581a74acf950012b7a571f5051b01",
+  "inputOrder": [
+    "Public",
+    "Public",
+    "Public"
+  ],
+  "signature": "3pfdkEqpo3rk3n1RKfxWJ3BTy4XswqypbaYxr59vjPFxYKYmTJfpj71UvhmkcMW6pLGsKjz19ZhW4nPEitdrgsr2",
+  "size": 124720
+}

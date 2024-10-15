@@ -14,7 +14,7 @@ use num_traits::FromPrimitive;
 use solana_rpc_client::nonblocking::rpc_client::RpcClient;
 use solana_rpc_client_api::config::RpcSendTransactionConfig;
 use solana_sdk::account::Account;
-use solana_sdk::commitment_config::CommitmentConfig;
+use solana_sdk::commitment_config::{CommitmentConfig, CommitmentLevel};
 use solana_sdk::compute_budget::ComputeBudgetInstruction;
 use solana_sdk::instruction::Instruction;
 use solana_sdk::message::{v0, VersionedMessage};
@@ -198,7 +198,7 @@ impl BonsolClient {
         signer: impl Signer,
         instructions: Vec<Instruction>,
     ) -> Result<()> {
-        self.send_txn(signer, instructions, false, 1, 5).await
+        self.send_txn(signer, instructions, true, 1, 5).await
     }
 
     pub async fn send_txn(
@@ -221,6 +221,7 @@ impl BonsolClient {
                     &tx,
                     RpcSendTransactionConfig {
                         skip_preflight,
+                        preflight_commitment: Some(CommitmentLevel::Confirmed),
                         max_retries: Some(0),
                         ..Default::default()
                     },

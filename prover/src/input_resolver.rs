@@ -110,7 +110,7 @@ impl DefaultInputResolver {
                 let url = input.data.ok_or(anyhow::anyhow!("Invalid data"))?;
                 let url = from_utf8(&url)?;
                 let url = Url::parse(url)?;
-                task_set.spawn(dowload_public_input(
+                task_set.spawn(download_public_input(
                     client,
                     index as u8,
                     url.clone(),
@@ -146,7 +146,7 @@ impl DefaultInputResolver {
                 let url = input.data.ok_or(anyhow::anyhow!("Invalid data"))?;
                 let url = from_utf8(&url)?;
                 let url = Url::parse(url)?;
-                task_set.spawn(dowload_public_input(
+                task_set.spawn(download_public_input(
                     client,
                     index as u8,
                     url.clone(),
@@ -316,7 +316,7 @@ pub fn resolve_remote_public_data(
 ) -> Result<JoinHandle<Result<ResolvedInput>>> {
     let url = from_utf8(data)?;
     let url = Url::parse(url)?;
-    Ok(tokio::task::spawn(dowload_public_input(
+    Ok(tokio::task::spawn(download_public_input(
         client,
         index as u8,
         url,
@@ -333,15 +333,15 @@ pub struct PrivateInputRequest {
     now_utc: u64,
 }
 
-async fn dowload_public_input(
+async fn download_public_input(
     client: Arc<reqwest::Client>,
     index: u8,
     url: Url,
-    max_size: usize,
+    max_input_size_mb: usize,
     input_type: ProgramInputType,
 ) -> Result<ResolvedInput> {
     let resp = client.get(url).send().await?.error_for_status()?;
-    let byte = get_body_max_size(resp.bytes_stream(), max_size).await?;
+    let byte = get_body_max_size(resp.bytes_stream(), max_input_size_mb * 1024 * 1024).await?;
     Ok(ResolvedInput {
         index,
         data: byte.to_vec(),
@@ -353,7 +353,7 @@ async fn download_private_input(
     client: Arc<reqwest::Client>,
     index: u8,
     url: Url,
-    max_size: usize,
+    max_input_size_mb: usize,
     body: String,
     claim_authorization: String,
 ) -> Result<ResolvedInput> {
@@ -366,7 +366,7 @@ async fn download_private_input(
         .send()
         .await?
         .error_for_status()?;
-    let byte = get_body_max_size(resp.bytes_stream(), max_size).await?;
+    let byte = get_body_max_size(resp.bytes_stream(), max_input_size_mb * 1024 * 1024).await?;
     Ok(ResolvedInput {
         index,
         data: byte.to_vec(),

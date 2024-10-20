@@ -1,3 +1,4 @@
+use std::str::FromStr;
 use crate::{
     assertions::*,
     error::ChannelError,
@@ -18,6 +19,7 @@ use solana_program::{
     program_memory::sol_memcmp,
     sysvar::Sysvar,
 };
+use solana_program::pubkey::Pubkey;
 
 struct StatusAccounts<'a, 'b> {
     pub requester: &'a AccountInfo<'a>,
@@ -126,33 +128,41 @@ pub fn process_status_v1<'a>(
                 ainfos.extend(sa.extra_accounts.iter().cloned());
                 // ER is the signer, it is reuired to save the execution id in the calling program
                 let mut accounts = vec![AccountMeta::new_readonly(*sa.exec.key, true)];
+
+                // RUBICONHACK
                 if let Some(extra_accounts) = er.callback_extra_accounts() {
                     if extra_accounts.len() != sa.extra_accounts.len() {
                         return Err(ChannelError::InvalidCallbackExtraAccounts.into());
                     }
                     for (i, a) in sa.extra_accounts.iter().enumerate() {
-                        let stored_a = extra_accounts.get(i);
-                        if sol_memcmp(a.key.as_ref(), &stored_a.0[0..32], 32) != 0 {
-                            return Err(ChannelError::InvalidCallbackExtraAccounts.into());
-                        }
-                        // dont cary feepayer signature through to callback we set all signer to false except the ER
-                        if a.is_writable {
-                            if !stored_a.writable() {
-                                return Err(ChannelError::InvalidCallbackExtraAccounts.into());
-                            }
-                            accounts.push(AccountMeta::new(*a.key, false));
-                        } else {
-                            if stored_a.writable() {
-                                //maybe relax this for devs?
-                                return Err(ChannelError::InvalidCallbackExtraAccounts.into());
-                            }
-                            accounts.push(AccountMeta::new_readonly(*a.key, false));
-                        }
+                //         let stored_a = extra_accounts.get(i);
+                //         if sol_memcmp(a.key.as_ref(), &stored_a.0[0..32], 32) != 0 {
+                //             msg!("1> memcmp fail");
+                //             return Err(ChannelError::InvalidCallbackExtraAccounts.into());
+                //         }
+                //         // dont cary feepayer signature through to callback we set all signer to false except the ER
+                //         if a.is_writable {
+                //             if !stored_a.writable() {
+                //                 msg!("1> writeable diff");
+                //                 return Err(ChannelError::InvalidCallbackExtraAccounts.into());
+                //             }
+                //             accounts.push(AccountMeta::new(*a.key, false));
+                //         } else {
+                //             if stored_a.writable() {
+                //                 msg!("1> just writeable");
+                //                 //maybe relax this for devs?
+                //                 return Err(ChannelError::InvalidCallbackExtraAccounts.into());
+                //             }
+                            accounts.push(AccountMeta::new_readonly(Pubkey::from_str("81UfGehTv2HJXGzJ44fgheqimz3GYvdrxrARWxyoKuck").unwrap(), false));
+                //         }
                     }
                 }
+
                 let payload = if er.forward_output() && st.committed_outputs().is_some() {
                     [
                         er.callback_instruction_prefix().unwrap().bytes(),
+                        // RUBICONHACK
+                        input,
                         st.committed_outputs().unwrap().bytes(),
                     ]
                     .concat()

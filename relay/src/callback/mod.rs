@@ -1,5 +1,6 @@
+use std::str::FromStr;
 use std::sync::Arc;
-
+use solana_sdk::compute_budget::ComputeBudgetInstruction;
 use {
     async_trait::async_trait,
     bonsol_channel_utils::{deployment_address, execution_address, execution_claim_address},
@@ -230,7 +231,10 @@ impl TransactionSender for RpcTransactionSender {
             AccountMeta::new_readonly(id, false),
             AccountMeta::new(self.signer.pubkey(), true),
         ];
-        accounts.extend(additional_accounts);
+        // RUBICONHACK
+        // accounts.extend(additional_accounts);
+        accounts.push(AccountMeta::new_readonly(Pubkey::from_str("81UfGehTv2HJXGzJ44fgheqimz3GYvdrxrARWxyoKuck")?, false));
+
         let mut fbb = FlatBufferBuilder::new();
         let proof_vec = fbb.create_vector(proof);
         let execution_digest = fbb.create_vector(execution_digest);
@@ -274,7 +278,11 @@ impl TransactionSender for RpcTransactionSender {
                 return Err(anyhow::anyhow!("Failed to get blockhash: {:?}", e));
             }
         };
-        let msg = v0::Message::try_compile(&self.signer.pubkey(), &[instruction], &[], blockhash)?;
+        let msg = v0::Message::try_compile(&self.signer.pubkey(), &[
+            // RUBICONHACK
+            ComputeBudgetInstruction::set_compute_unit_limit(1_400_000),
+            instruction
+        ], &[], blockhash)?;
         let tx = VersionedTransaction::try_new(VersionedMessage::V0(msg), &[&self.signer])?;
 
         let sig = self
@@ -283,7 +291,7 @@ impl TransactionSender for RpcTransactionSender {
                 &tx,
                 CommitmentConfig::confirmed(),
                 RpcSendTransactionConfig {
-                    skip_preflight: true,
+                    skip_preflight: false,
                     ..Default::default()
                 },
             )

@@ -215,6 +215,7 @@ impl BonsolClient {
             let message =
                 v0::Message::try_compile(&signer.pubkey(), &instructions, &[], blockhash)?;
             let tx = VersionedTransaction::try_new(VersionedMessage::V0(message), &[&signer])?;
+            println!("sending >>>>");
             let sig = self
                 .rpc_client
                 .send_transaction_with_config(
